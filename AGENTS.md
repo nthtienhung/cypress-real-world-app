@@ -19,6 +19,10 @@ yarn start:api              # Backend only
 
 **Keep code and documentation concise.** Avoid unnecessary comments, verbose explanations, and redundant text.
 
+-keep response as concise and simple as possible, without losing important info.
+
+-always find the simpliest solution to the problem you're solving. 
+
 ### Imports
 
 - Group: React/libs → internal → types

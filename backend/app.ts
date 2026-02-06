@@ -29,7 +29,10 @@ import { frontendPort, getBackendPort } from "../src/utils/portUtils";
 require("dotenv").config();
 
 const corsOption = {
-  origin: [`http://localhost:${frontendPort}`, "https://trimetric-noncartelized-sherman.ngrok-free.dev"],
+  origin: [
+    `http://localhost:${frontendPort}`, 
+    "https://trimetric-noncartelized-sherman.ngrok-free.dev"
+  ],
   credentials: true,
 };
 
