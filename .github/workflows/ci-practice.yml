@@ -14,42 +14,65 @@ on:
   workflow_dispatch:  # Allows manual trigger from GitHub Actions UI
 
 jobs:
-  # Job 1: Simple smoke test - runs one quick test file
-  smoke-test:
-    name: Smoke Test - Auth
+  # Job 1: API tests - creates/verifies users
+  test-api:
+    name: TestA - API Users
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
-      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'yarn'
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # Step 4: Build the app
       - name: Build application
         run: yarn build:ci
 
-      # Step 5: Run a single quick test (smoke test)
-      - name: Run smoke test
+      - name: Run API user tests
         uses: cypress-io/github-action@v6
         with:
-          # Start the application automatically
           start: yarn start:ci
-          # Wait for the app to be ready
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
-          # Browser to use
           browser: chrome
-          # Test spec to run
+          spec: cypress/tests/api/api-users.spec.ts
+
+  # Job 2: UI tests - depends on API tests passing
+  test-ui:
+    name: TestB - UI Auth
+    needs: test-api  # Only runs if test-api succeeds
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build application
+        run: yarn build:ci
+
+      - name: Run UI auth tests
+        uses: cypress-io/github-action@v6
+        with:
+          start: yarn start:ci
+          wait-on: "http://localhost:3000"
+          wait-on-timeout: 120
+          browser: chrome
           spec: cypress/tests/ui/auth.spec.ts
