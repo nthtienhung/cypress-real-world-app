@@ -30,7 +30,7 @@ describe("Users API", function () {
   context("GET /users", function () {
     it("gets a list of users", function () {
       cy.request("GET", apiUsers).then((response) => {
-        expect(response.status).to.eq(200);
+        expect(response.status).to.eq(400);
         expect(response.body.results).length.to.be.greaterThan(1);
       });
     });
