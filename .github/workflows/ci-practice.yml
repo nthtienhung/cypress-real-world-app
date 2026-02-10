@@ -42,7 +42,14 @@ jobs:
 
       # Step 5: Run a single quick test (smoke test)
       - name: Run smoke test
-        run: |
-          yarn cypress run \
-            --browser chrome \
-            --spec "cypress/tests/ui/auth.spec.ts"
+        uses: cypress-io/github-action@v6
+        with:
+          # Start the application automatically
+          start: yarn start:ci
+          # Wait for the app to be ready
+          wait-on: "http://localhost:3000"
+          wait-on-timeout: 120
+          # Browser to use
+          browser: chrome
+          # Test spec to run
+          spec: cypress/tests/ui/auth.spec.ts
