@@ -36,14 +36,15 @@ jobs:
       - name: Build application
         run: yarn build:ci
 
-      - name: Run API user tests
-        uses: cypress-io/github-action@v6
-        with:
-          start: yarn start:ci
-          wait-on: "http://localhost:3000"
-          wait-on-timeout: 120
-          browser: chrome
-          spec: cypress/tests/api/api-users.spec.ts
+      - name: Start application
+        run: yarn start:ci &
+        shell: bash
+
+      - name: Wait for app
+        run: npx wait-on http://localhost:3000 --timeout 120000
+
+      - name: Run single API test
+        run: yarn cypress run --spec "cypress/tests/api/api-users.spec.ts" --grep "gets a list of users"
 
   # Job 2: UI tests - depends on API tests passing
   test-ui:
@@ -68,11 +69,12 @@ jobs:
       - name: Build application
         run: yarn build:ci
 
-      - name: Run UI auth tests
-        uses: cypress-io/github-action@v6
-        with:
-          start: yarn start:ci
-          wait-on: "http://localhost:3000"
-          wait-on-timeout: 120
-          browser: chrome
-          spec: cypress/tests/ui/auth.spec.ts
+      - name: Start application
+        run: yarn start:ci &
+        shell: bash
+
+      - name: Wait for app
+        run: npx wait-on http://localhost:3000 --timeout 120000
+
+      - name: Run single UI test
+        run: yarn cypress run --spec "cypress/tests/ui/auth.spec.ts" --grep "should redirect unauthenticated user to signin page"

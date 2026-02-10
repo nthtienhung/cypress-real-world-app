@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Always provide the most professional and concise solution.** Optimize for clarity, efficiency, and maintainability. Avoid unnecessary complexity.
 
+**Be concise in responses.** Provide direct answers without lengthy explanations unless requested. Focus on actionable code and essential information.
+
 ## Overview
 
 This is a Cypress testing demonstration project featuring a full-stack payment application. The focus is on **real-world testing patterns**, not the application code itself.
