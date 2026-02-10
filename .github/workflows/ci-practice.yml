@@ -1,0 +1,48 @@
+# ===================================
+# CI Practice - V1: Simple Smoke Test
+# ===================================
+# This workflow runs a quick smoke test to verify basic functionality
+# Purpose: Learn the basics of GitHub Actions + Cypress
+
+name: CI Practice
+
+# Trigger: Run on push to your branch, and allow manual trigger
+on:
+  push:
+    branches:
+      - configure-pipeline-n-integrate-squashtm-teams
+  workflow_dispatch:  # Allows manual trigger from GitHub Actions UI
+
+jobs:
+  # Job 1: Simple smoke test - runs one quick test file
+  smoke-test:
+    name: Smoke Test - Auth
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Step 4: Build the app
+      - name: Build application
+        run: yarn build:ci
+
+      # Step 5: Run a single quick test (smoke test)
+      - name: Run smoke test
+        run: |
+          yarn cypress run \
+            --browser chrome \
+            --spec "cypress/tests/ui/auth.spec.ts"
