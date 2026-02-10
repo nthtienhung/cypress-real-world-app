@@ -1,0 +1,42 @@
+name: CI Practice - Weekly (UI Tests)
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Every 10 minutes for testing - TODO: Change to '0 2 * * 1' for production (Monday 9AM)
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual run'
+        required: false
+        default: 'Manual test'
+
+jobs:
+  test-ui:
+    name: TestB - UI Auth
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build application
+        run: yarn build:ci
+
+      - name: Run UI auth tests
+        uses: cypress-io/github-action@v6
+        with:
+          start: yarn start:ci
+          wait-on: "http://localhost:3000"
+          wait-on-timeout: 120
+          browser: chrome
+          spec: cypress/tests/ui/auth.spec.ts
