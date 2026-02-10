@@ -3,12 +3,6 @@ name: CI Practice - Daily (API Tests)
 on:
   schedule:
     - cron: '*/1 * * * *'  # Every 1 minute for testing - TODO: Change to '0 2 * * *' for production
-  workflow_dispatch:
-    inputs:
-      reason:
-        description: 'Reason for manual run'
-        required: false
-        default: 'Manual test'
 
 jobs:
   test-api:
