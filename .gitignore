@@ -52,3 +52,7 @@ amplifytools.xcconfig
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+cypress/results
+yarn.lock
+.claude/settings.local.json

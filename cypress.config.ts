@@ -23,6 +23,12 @@ export default defineConfig({
   retries: {
     runMode: 2,
   },
+  // JUnit reporter for SquashTM integration
+  reporter: "junit",
+  reporterOptions: {
+    mochaFile: "cypress/results/results-[hash].xml",
+    toConsole: true,
+  },
   env: {
     apiUrl: "http://localhost:3001",
     mobileViewportWidthBreakpoint: 414,
