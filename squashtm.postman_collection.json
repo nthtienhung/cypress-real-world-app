@@ -1,0 +1,1330 @@
+{
+  "info": {
+    "_postman_id": "f4a6ad61-c556-4085-8785-da47af854f6e",
+    "name": "squashtm",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "11443120"
+  },
+  "item": [
+    {
+      "name": "create new iteration",
+      "item": [
+        {
+          "name": "Create execution for a test plan item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "undefined",
+                  "type": "any"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "default"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"_type\" : \"execution\",\n  \"execution_mode\" : \"AUTOMATED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/squash/api/rest/latest/test-plan-items/849/executions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "api",
+                "rest",
+                "latest",
+                "test-plan-items",
+                "849",
+                "executions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create iteration test plan item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "undefined",
+                  "type": "any"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "default"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"_type\": \"campaign-test-plan-item\",\n  \"test_case\": {\n    \"_type\": \"test-case\",\n    \"id\": 91215\n  }\n//   ,\n//   \"execution_status\": \"SUCCESS\",\n//   \"dataset\": null,\n//   \"assigned_to\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/squash/api/rest/latest/iterations/31/test-plan",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "api",
+                "rest",
+                "latest",
+                "iterations",
+                "31",
+                "test-plan"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modify an execution",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "undefined",
+                  "type": "any"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "default"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"_type\" : \"execution\",\n  \"execution_status\" : \"SUCCESS\"\n}\n\n// SUCCESS\n// FAILURE\n// BLOCKED",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/squash/api/rest/latest/executions/24",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "api",
+                "rest",
+                "latest",
+                "executions",
+                "24"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modify iteration",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "undefined",
+                  "type": "any"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "default"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\" : \"FINISHED\"\n}\n\n\n// Undefined;\n// Planned (by default);\n// In progress;\n// Finished;\n// Archived.",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/squash/api/rest/latest/iterations/16",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "api",
+                "rest",
+                "latest",
+                "iterations",
+                "16"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create iteration",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "undefined",
+                  "type": "any"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "default"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"_type\" : \"iteration\",\n  \"name\" : \"[Auto]-261226\",\n  \"status\" : \"FINISHED\",\n  \"actual_start_auto\" : false,\n  \"actual_end_auto\" : true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/squash/api/rest/latest/campaigns/10/iterations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "api",
+                "rest",
+                "latest",
+                "campaigns",
+                "10",
+                "iterations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create campaign",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "undefined",
+                  "type": "any"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json, text/plain, */*",
+                "type": "default"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "en,vi;q=0.9,en-GB;q=0.8,en-US;q=0.7",
+                "type": "default"
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "type": "default"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "default"
+              },
+              {
+                "key": "Cookie",
+                "value": "JSESSIONID=C93F7FC4AF089328B706292DE95688D3; XSRF-TOKEN=d528ba6e-cfa3-4843-acac-247d7e6635db",
+                "type": "default"
+              },
+              {
+                "key": "Origin",
+                "value": "https://squashtm.int.chartertech.global",
+                "type": "default"
+              },
+              {
+                "key": "Referer",
+                "value": "https://squashtm.int.chartertech.global/squash/campaign-workspace/iteration/110/dashboard?anchor=dashboard",
+                "type": "default"
+              },
+              {
+                "key": "Sec-Fetch-Dest",
+                "value": "empty",
+                "type": "default"
+              },
+              {
+                "key": "Sec-Fetch-Mode",
+                "value": "cors",
+                "type": "default"
+              },
+              {
+                "key": "Sec-Fetch-Site",
+                "value": "same-origin",
+                "type": "default"
+              },
+              {
+                "key": "User-Agent",
+                "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+                "type": "default"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "d528ba6e-cfa3-4843-acac-247d7e6635db",
+                "type": "default"
+              },
+              {
+                "key": "sec-ch-ua",
+                "value": "\"Microsoft Edge\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+                "type": "default"
+              },
+              {
+                "key": "sec-ch-ua-mobile",
+                "value": "?0",
+                "type": "default"
+              },
+              {
+                "key": "sec-ch-ua-platform",
+                "value": "\"macOS\"",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"_type\" : \"campaign\",\n  \"name\" : \"Campaign Test2\",\n  \"status\" : \"IN_PROGRESS\",\n  \"actual_start_auto\" : false,\n  \"actual_end_auto\" : false,\n  \"parent\" : {\n    \"_type\" : \"campaign-folder\",\n    \"id\" : 6\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/squash/api/rest/latest/campaigns",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "api",
+                "rest",
+                "latest",
+                "campaigns"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete campaign",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "undefined",
+                  "type": "any"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json, text/plain, */*",
+                "type": "default"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "en,vi;q=0.9,en-GB;q=0.8,en-US;q=0.7",
+                "type": "default"
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "type": "default"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "default"
+              },
+              {
+                "key": "Cookie",
+                "value": "JSESSIONID=C93F7FC4AF089328B706292DE95688D3; XSRF-TOKEN=d528ba6e-cfa3-4843-acac-247d7e6635db",
+                "type": "default"
+              },
+              {
+                "key": "Origin",
+                "value": "https://squashtm.int.chartertech.global",
+                "type": "default"
+              },
+              {
+                "key": "Referer",
+                "value": "https://squashtm.int.chartertech.global/squash/campaign-workspace/iteration/110/dashboard?anchor=dashboard",
+                "type": "default"
+              },
+              {
+                "key": "Sec-Fetch-Dest",
+                "value": "empty",
+                "type": "default"
+              },
+              {
+                "key": "Sec-Fetch-Mode",
+                "value": "cors",
+                "type": "default"
+              },
+              {
+                "key": "Sec-Fetch-Site",
+                "value": "same-origin",
+                "type": "default"
+              },
+              {
+                "key": "User-Agent",
+                "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+                "type": "default"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "d528ba6e-cfa3-4843-acac-247d7e6635db",
+                "type": "default"
+              },
+              {
+                "key": "sec-ch-ua",
+                "value": "\"Microsoft Edge\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+                "type": "default"
+              },
+              {
+                "key": "sec-ch-ua-mobile",
+                "value": "?0",
+                "type": "default"
+              },
+              {
+                "key": "sec-ch-ua-platform",
+                "value": "\"macOS\"",
+                "type": "default"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/squash/api/rest/latest/campaigns/430",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "api",
+                "rest",
+                "latest",
+                "campaigns",
+                "430"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "create testsuites",
+      "item": [
+        {
+          "name": "Attach item to test suite",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "undefined",
+                  "type": "any"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "default"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"_type\" : \"test-suite\",\n  \"name\" : \"test-suite-1\",\n  \"description\" : \"<p>this is a sample test suite</p>\",\n  \"parent\" : {\n    \"_type\" : \"iteration\",\n    \"id\" : 110\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/squash/api/rest/latest/test-suites",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "api",
+                "rest",
+                "latest",
+                "test-suites"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create testsuite",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "undefined",
+                  "type": "any"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "default"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "default"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/squash/api/rest/latest/test-suites/8/test-plan/948",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "api",
+                "rest",
+                "latest",
+                "test-suites",
+                "8",
+                "test-plan",
+                "948"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "statitics",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "3fb3ca7a-813d-4746-86f0-e1fda64f0570",
+                "type": "default"
+              },
+              {
+                "key": "Cookie",
+                "value": "XSRF-TOKEN=3fb3ca7a-813d-4746-86f0-e1fda64f0570",
+                "type": "default"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "minh",
+                  "type": "default"
+                },
+                {
+                  "key": "password",
+                  "value": "admin123",
+                  "type": "default"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/squash/backend/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "backend",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "pre-login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "type": "default"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded",
+                "type": "default"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "3fb3ca7a-813d-4746-86f0-e1fda64f0570",
+                "type": "default"
+              },
+              {
+                "key": "Cookie",
+                "value": "XSRF-TOKEN=3fb3ca7a-813d-4746-86f0-e1fda64f0570",
+                "type": "default"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/squash/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "statitics",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "default"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "3fb3ca7a-813d-4746-86f0-e1fda64f0570",
+                "type": "default"
+              },
+              {
+                "key": "Cookie",
+                "value": "XSRF-TOKEN=3fb3ca7a-813d-4746-86f0-e1fda64f0570; JSESSIONID=FC632F5D9D041E655AD8AA2BBFF9DCB7; XSRF-TOKEN=541429e2-f2e4-4288-867b-e847bf429f85",
+                "type": "default"
+              },
+              {
+                "key": "Host",
+                "value": "squashtm.int.chartertech.global",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lastExecutionScope\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/squash/backend/campaign-view/370/statistics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "squash",
+                "backend",
+                "campaign-view",
+                "370",
+                "statistics"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Delete an execution",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "undefined",
+              "type": "any"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "default"
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "default"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/squash/api/rest/latest/executions/15",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "squash",
+            "api",
+            "rest",
+            "latest",
+            "executions",
+            "15"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get  iteration",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const body = res.body;",
+              "",
+              "if (!body?._embedded?.[\"test-plan\"]) {",
+              "  throw new Error(\"Response does not contain test-plan data\");",
+              "}",
+              "",
+              "const testPlans = body._embedded[\"test-plan\"];",
+              "const summary = {};",
+              "",
+              "testPlans.forEach(item => {",
+              "  const status = item.execution_status || \"UNKNOWN\";",
+              "  const testCase = item.referenced_test_case;",
+              "",
+              "  if (!summary[status]) {",
+              "    summary[status] = {",
+              "      total: 0,",
+              "      testCases: []",
+              "    };",
+              "  }",
+              "",
+              "  summary[status].total += 1;",
+              "  summary[status].testCases.push({",
+              "    id: testCase?.id,",
+              "    name: testCase?.name",
+              "  });",
+              "});",
+              "",
+              "console.log(\"===== TEST PLAN SUMMARY =====\");",
+              "",
+              "Object.keys(summary).forEach(status => {",
+              "  console.log(\"\");",
+              "  console.log(\"Status:\", status);",
+              "  console.log(\"Total:\", summary[status].total);",
+              "",
+              "  summary[status].testCases.forEach(tc => {",
+              "    console.log(`- TestCaseId: ${tc.id} | Name: ${tc.name}`);",
+              "  });",
+              "});",
+              "",
+              "// Lưu env nếu cần dùng tiếp",
+              "bru.setEnvVar(",
+              "  \"testplan_summary\",",
+              "  JSON.stringify(summary)",
+              ");",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "undefined",
+              "type": "any"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "default"
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "default"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/squash/api/rest/latest/iterations/65/test-plan",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "squash",
+            "api",
+            "rest",
+            "latest",
+            "iterations",
+            "65",
+            "test-plan"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get campaign",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "undefined",
+              "type": "any"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*",
+            "type": "default"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "default"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en,vi;q=0.9,en-GB;q=0.8,en-US;q=0.7",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "Cookie",
+            "value": "JSESSIONID=C93F7FC4AF089328B706292DE95688D3; XSRF-TOKEN=d528ba6e-cfa3-4843-acac-247d7e6635db",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "Origin",
+            "value": "https://squashtm.int.chartertech.global",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "Referer",
+            "value": "https://squashtm.int.chartertech.global/squash/campaign-workspace/iteration/110/dashboard?anchor=dashboard",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-origin",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "X-XSRF-TOKEN",
+            "value": "d528ba6e-cfa3-4843-acac-247d7e6635db",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Microsoft Edge\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?0",
+            "type": "default",
+            "disabled": true
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"macOS\"",
+            "type": "default",
+            "disabled": true
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/squash/api/rest/latest/campaigns/1221",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "squash",
+            "api",
+            "rest",
+            "latest",
+            "campaigns",
+            "1221"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get execution",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "undefined",
+              "type": "any"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "default"
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "default"
+          }
+        ],
+        "url": {
+          "raw": "https://squashtm.int.chartertech.global/squash/api/rest/latest/executions/4534",
+          "protocol": "https",
+          "host": [
+            "squashtm",
+            "int",
+            "chartertech",
+            "global"
+          ],
+          "path": [
+            "squash",
+            "api",
+            "rest",
+            "latest",
+            "executions",
+            "4534"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get iteration test plan",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "undefined",
+              "type": "any"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "default"
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "default"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/squash/api/rest/latest/iterations/20/test-plan",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "squash",
+            "api",
+            "rest",
+            "latest",
+            "iterations",
+            "20",
+            "test-plan"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get test plan item",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "undefined",
+              "type": "any"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "default"
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "default"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/squash/api/rest/latest/test-plan-items/648",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "squash",
+            "api",
+            "rest",
+            "latest",
+            "test-plan-items",
+            "648"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get testcase",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "undefined",
+              "type": "any"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "default"
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "default"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/squash/api/rest/latest/test-cases/80725",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "squash",
+            "api",
+            "rest",
+            "latest",
+            "test-cases",
+            "80725"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "modify campaign",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "undefined",
+              "type": "any"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*",
+            "type": "default"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en,vi;q=0.9,en-GB;q=0.8,en-US;q=0.7",
+            "type": "default"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive",
+            "type": "default"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "default"
+          },
+          {
+            "key": "Cookie",
+            "value": "JSESSIONID=C93F7FC4AF089328B706292DE95688D3; XSRF-TOKEN=d528ba6e-cfa3-4843-acac-247d7e6635db",
+            "type": "default"
+          },
+          {
+            "key": "Origin",
+            "value": "https://squashtm.int.chartertech.global",
+            "type": "default"
+          },
+          {
+            "key": "Referer",
+            "value": "https://squashtm.int.chartertech.global/squash/campaign-workspace/iteration/110/dashboard?anchor=dashboard",
+            "type": "default"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty",
+            "type": "default"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors",
+            "type": "default"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-origin",
+            "type": "default"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+            "type": "default"
+          },
+          {
+            "key": "X-XSRF-TOKEN",
+            "value": "d528ba6e-cfa3-4843-acac-247d7e6635db",
+            "type": "default"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Microsoft Edge\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+            "type": "default"
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?0",
+            "type": "default"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"macOS\"",
+            "type": "default"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"_type\": \"campaign\",\n  \"status\": \"IN_PROGRESS\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/squash/api/rest/latest/campaigns/251",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "squash",
+            "api",
+            "rest",
+            "latest",
+            "campaigns",
+            "251"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
