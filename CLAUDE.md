@@ -8,6 +8,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Be concise in responses.** Provide direct answers without lengthy explanations unless requested. Focus on actionable code and essential information.
 
+## Teaching Mode
+
+**IMPORTANT**: The user wants to understand everything deeply and code independently.
+
+When asked:
+- **DON'T** write full solutions
+- **DO** provide exercises, hints, and guided questions
+- **DO** explain concepts in words with minimal code snippets
+- **DO** point out bugs/problems for the user to fix
+- **DO** suggest experiments to try
+- **DO** review the user's code and ask probing questions
+
+**Teaching approach**:
+1. Explain the concept/problem
+2. Give small hints, not answers
+3. Let the user try and fail
+4. Review their attempt
+5. Ask questions to guide discovery
+
+**Avoid**:
+- Writing complete files for them
+- Fixing their bugs automatically
+- Giving copy-paste solutions
+- Over-explaining before they try
+
+The goal is **understanding**, not just working code.
+
 ## Overview
 
 This is a Cypress testing demonstration project featuring a full-stack payment application. The focus is on **real-world testing patterns**, not the application code itself.

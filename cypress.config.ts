@@ -135,6 +135,25 @@ export default defineConfig({
           }
           return { refreshToken, clientSecret };
         },
+
+        // SquashTM integration tasks
+        async "squash:init"(config) {
+          const squashTasks = require("./cypress/support/squash-tasks");
+          return squashTasks.squashInit(config);
+        },
+        async "squash:createIteration"({ campaignId, name }) {
+          console.log("Task received:", { campaignId, name, type: typeof campaignId });
+          const squashTasks = require("./cypress/support/squash-tasks");
+          return squashTasks.squashCreateIteration({ campaignId, name });
+        },
+        async "squash:report"({ iterationId, testCaseId, status }) {
+          const squashTasks = require("./cypress/support/squash-tasks");
+          return squashTasks.squashReportResult({ iterationId, testCaseId, status });
+        },
+        async "squash:finish"() {
+          const squashTasks = require("./cypress/support/squash-tasks");
+          return squashTasks.squashFinish();
+        },
       });
 
       codeCoverageTask(on, config);

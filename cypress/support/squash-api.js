@@ -8,9 +8,9 @@ const axios = require('axios');
 
 class SquashAPI {
   constructor(config = {}) {
-    this.baseUrl = config.baseUrl || 'http://localhost:8080';
-    this.username = config.username || 'admin';
-    this.password = config.password || 'admin';
+    this.baseUrl = (config.baseUrl || 'https://squash-tm-dev-01.l0tt0.online').replace(/\/$/, '');
+    this.username = config.username || 'hung.nguyen';
+    this.password = config.password || 'bannerman123';
     this.apiToken = config.apiToken || null;
     this.sessionCookie = null;
     this.xsrfToken = null;
@@ -22,23 +22,38 @@ class SquashAPI {
    */
   async login() {
     try {
+      console.log(`   Connecting to: ${this.baseUrl}`);
+      console.log(`   Username: ${this.username}`);
+
       // First, get XSRF token from login page
-      const preLogin = await axios.get(`${this.baseUrl}/squash/login`, {
-        withCredentials: true
+      const loginUrl = `${this.baseUrl.replace(/\/$/, '')}/squash/login`;
+      console.log(`   Fetching XSRF token from: ${loginUrl}`);
+
+      const preLogin = await axios.get(loginUrl, {
+        withCredentials: true,
+        timeout: 10000
       });
 
       // Extract XSRF token from response headers or cookies
       const cookies = preLogin.headers['set-cookie'];
+      console.log(`   Cookies received: ${cookies ? cookies.length : 0}`);
+
       if (cookies) {
         const xsrfMatch = cookies.find(c => c.includes('XSRF-TOKEN'));
         if (xsrfMatch) {
           this.xsrfToken = xsrfMatch.split(';')[0].split('=')[1];
+          console.log(`   XSRF token: ${this.xsrfToken.substring(0, 10)}...`);
+        } else {
+          console.log('   ⚠️ No XSRF-TOKEN cookie found');
         }
       }
 
       // Perform login
+      const backendUrl = `${this.baseUrl.replace(/\/$/, '')}/squash/backend/login`;
+      console.log(`   Posting login to: ${backendUrl}`);
+
       const loginResponse = await axios.post(
-        `${this.baseUrl}/squash/backend/login`,
+        backendUrl,
         new URLSearchParams({
           username: this.username,
           password: this.password
@@ -51,9 +66,12 @@ class SquashAPI {
           },
           withCredentials: true,
           maxRedirects: 0,
-          validateStatus: (status) => status >= 200 && status < 400
+          validateStatus: (status) => status >= 200 && status < 400,
+          timeout: 10000
         }
       );
+
+      console.log(`   Login response status: ${loginResponse.status}`);
 
       // Extract session cookie
       const sessionCookies = loginResponse.headers['set-cookie'];
@@ -61,6 +79,7 @@ class SquashAPI {
         const jsessionMatch = sessionCookies.find(c => c.includes('JSESSIONID'));
         if (jsessionMatch) {
           this.sessionCookie = jsessionMatch.split(';')[0];
+          console.log(`   Session cookie: ${this.sessionCookie.substring(0, 20)}...`);
         }
       }
 
@@ -68,6 +87,13 @@ class SquashAPI {
       return true;
     } catch (error) {
       console.error('❌ Login failed:', error.message);
+      if (error.response) {
+        console.error('   Status:', error.response.status);
+        console.error('   Data:', error.response.data);
+        console.error('   Headers:', JSON.stringify(error.response.headers, null, 2));
+      } else if (error.request) {
+        console.error('   No response received. Check URL and network.');
+      }
       throw error;
     }
   }
@@ -146,12 +172,15 @@ class SquashAPI {
    * POST /squash/api/rest/latest/campaigns/{campaignId}/iterations
    */
   async createIteration(campaignId, name = null) {
+    console.log(`   Creating iteration - campaignId: ${campaignId}, type: ${typeof campaignId}`);
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const iterationName = name || `[Auto]-${timestamp}`;
 
     try {
+      const url = `${this.baseUrl}/squash/api/rest/latest/campaigns/${Number(campaignId)}/iterations`;
+      console.log(`   POST ${url}`);
       const response = await axios.post(
-        `${this.baseUrl}/squash/api/rest/latest/campaigns/${campaignId}/iterations`,
+        url,
         {
           _type: 'iteration',
           name: iterationName,

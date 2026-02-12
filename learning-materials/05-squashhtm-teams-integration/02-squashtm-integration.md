@@ -1,582 +1,210 @@
 # SquashTM Integration
 
-Integrate Cypress tests with SquashTM for automated test result reporting.
+Auto-report Cypress test results to SquashTM.
 
 ---
 
 ## How It Works
 
+Cypress tests run in browser, but SquashTM API needs Node.js. We use `cy.task()` as a bridge.
+
 ```
-Cypress Test Run          SquashTM API
-     │                          │
-     ├── 1. Login ─────────────▶│
-     ├── 2. Create Iteration ──▶│
-     ├── 3. Add Test Case ─────▶│
-     ├── 4. Create Execution ──▶│
-     ├── 5. Update Status ─────▶│
-     └── 6. Finish ────────────▶│
+Cypress (Browser)          Node.js (Backend)          SquashTM
+     │                            │                        │
+     │── cy.task("squash:init") ──▶│── login() ────────────▶│
+     │── cy.task("squash:report") ─▶│── update status() ────▶│
 ```
+
+**Why not call API directly from Cypress?** Browser has CORS restrictions and can't access filesystem for API token.
 
 ---
 
 ## Prerequisites
 
-1. SquashTM running locally (http://localhost:8080)
-2. API Token generated in SquashTM
-3. At least one project with test cases
-4. Install dependency: `npm install axios` or `yarn add axios`
+1. API Token from SquashTM (My Account → API Tokens)
+2. Campaign ID (from URL: `/campaign/11/dashboard` → ID is `11`)
+3. Test Case IDs (from URL: `/test-case/123/info` → ID is `123`)
+4. `npm install axios`
+
+Save token to `apitoken.txt` (add to `.gitignore`)
 
 ---
 
-## Step 1: Generate API Token
+## Architecture
 
-1. Open SquashTM: `http://localhost:8080/squash`
-2. Login → Click **username** (top right) → **My Account**
-3. Go to **API Tokens** tab
-4. Click **Generate new token**
-5. Save the token (used in next step)
+### 3 Layers:
 
----
+| Layer | File | Purpose |
+|-------|------|---------|
+| **API Client** | `squash-api.js` | Talks to SquashTM REST API |
+| **Tasks** | `squash-tasks.js` | Node.js functions called via `cy.task()` |
+| **Cypress Hooks** | `e2e.ts` | Auto-report after each test |
 
-## Step 2: Find Your IDs
+### Data Flow:
 
-Before running, you need to find your Campaign ID and Project ID from SquashTM.
-
-### Finding Campaign ID
-
-Look at the URL when viewing a campaign:
-```
-http://localhost:8080/squash/campaign-workspace/campaign/1/dashboard
-```
-The number after `/campaign/` is your campaign ID (e.g., `1`).
-
-### Finding Project ID
-
-Look at the URL when viewing a project:
-```
-http://localhost:8080/squash/project-workspace/1/test-case-workspace
-```
-The number after `/project-workspace/` is your project ID (e.g., `1`).
+1. **Before all tests**: Login → Create iteration in campaign
+2. **After each test**: Get test name → Map to test case ID → Report pass/fail
+3. **After all tests**: Mark iteration as finished
 
 ---
 
-## Step 3: Save Token
+## Setup
 
-Create file `apitoken.txt` in project root:
+### Step 1: Map Test Names to IDs
 
+**File**: `cypress/support/squash-mappings.ts`
+
+Map your Cypress test names to SquashTM test case IDs:
+
+```typescript
+export const testCaseMappings: Record<string, number> = {
+  "TC-1: gets a list of users": 2,  // "test name": squashtm_id
+  "gets a user": 3,
+  // add more...
+};
+
+export const getTestCaseId = (testName: string): number | null => {
+  return testCaseMappings[testName] || null;
+};
 ```
-eyJhbGciOiJIUzUxMiJ9... (your token here)
-```
+
+**How to find test case ID**: Open test case in SquashTM, look at URL. `/test-case/123/info` → ID is `123`.
 
 ---
 
-## Step 4: Add Test Steps in SquashTM
+### Step 2: Register Tasks
 
-**Important:** Test cases need steps before execution.
+**File**: `cypress.config.ts`
 
-1. SquashTM → **Projects** → Your project
-2. **Test Cases** tab
-3. Click on a test case
-4. Add at least one step:
-   - Step 1: "Verify API returns 200"
-   - Expected result: "Status code is 200"
-5. Save
+Add to `setupNodeEvents()`:
+
+```typescript
+on("task", {
+  async "squash:init"(config) {
+    const tasks = require("./cypress/support/squash-tasks");
+    return tasks.squashInit(config);
+  },
+  async "squash:createIteration"({ campaignId, name }) {
+    const tasks = require("./cypress/support/squash-tasks");
+    return tasks.squashCreateIteration({ campaignId, name });
+  },
+  async "squash:report"({ iterationId, testCaseId, status }) {
+    const tasks = require("./cypress/support/squash-tasks");
+    return tasks.squashReportResult({ iterationId, testCaseId, status });
+  },
+  async "squash:finish"() {
+    const tasks = require("./cypress/support/squash-tasks");
+    return tasks.squashFinish();
+  },
+});
+```
+
+This lets you call `cy.task("squash:report", ...)` in tests.
 
 ---
 
-## Step 5: API Client Setup
+### Step 3: Add Cypress Hooks
 
-File: `cypress/support/squash-api.js`
+**File**: `cypress/support/e2e.ts`
 
-```javascript
-const axios = require('axios');
+```typescript
+import { getTestCaseId } from "./squash-mappings";
 
-class SquashAPI {
-  constructor(config = {}) {
-    this.baseUrl = config.baseUrl || 'http://localhost:8080';
-    this.apiToken = config.apiToken || null;
-  }
+const CAMPAIGN_ID = 11;  // Your campaign ID
+let iterationId: number | null = null;
 
-  getAuthHeaders() {
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-
-    if (this.apiToken) {
-      headers['Authorization'] = `Bearer ${this.apiToken}`;
-    }
-
-    return headers;
-  }
-
-  async login() {
-    const preLogin = await axios.get(`${this.baseUrl}/squash/login`, {
-      withCredentials: true
+// Before all: Login and create iteration
+before(() => {
+  cy.readFile("apitoken.txt").then((token: string) => {
+    cy.task("squash:init", {
+      baseUrl: "https://your-squashtm.com",
+      username: "your-user",
+      password: "your-pass",
+      apiToken: token.trim(),
     });
 
-    const cookies = preLogin.headers['set-cookie'];
-    let xsrfToken = '';
-    if (cookies) {
-      const xsrfMatch = cookies.find(c => c.includes('XSRF-TOKEN'));
-      if (xsrfMatch) {
-        xsrfToken = xsrfMatch.split(';')[0].split('=')[1];
-      }
-    }
-
-    const loginResponse = await axios.post(
-      `${this.baseUrl}/squash/backend/login`,
-      new URLSearchParams({ username: 'admin', password: 'admin' }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-XSRF-TOKEN': xsrfToken,
-          'Cookie': `XSRF-TOKEN=${xsrfToken}`
-        },
-        withCredentials: true,
-        maxRedirects: 0,
-        validateStatus: (status) => status >= 200 && status < 400
-      }
-    );
-
-    const sessionCookies = loginResponse.headers['set-cookie'];
-    let sessionCookie = '';
-    if (sessionCookies) {
-      const jsessionMatch = sessionCookies.find(c => c.includes('JSESSIONID'));
-      if (jsessionMatch) {
-        sessionCookie = jsessionMatch.split(';')[0];
-      }
-    }
-
-    this.sessionCookie = sessionCookie;
-    this.xsrfToken = xsrfToken;
-    return true;
-  }
-
-  async createIteration(campaignId, name = null) {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const iterationName = name || `[Auto]-${timestamp}`;
-
-    const response = await axios.post(
-      `${this.baseUrl}/squash/api/rest/latest/campaigns/${campaignId}/iterations`,
-      {
-        _type: 'iteration',
-        name: iterationName,
-        status: 'IN_PROGRESS',
-        actual_start_auto: false,
-        actual_end_auto: false
-      },
-      {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }
-    );
-
-    return {
-      id: response.data.id,
-      name: iterationName
-    };
-  }
-
-  async getTestCases(projectId) {
-    const response = await axios.get(
-      `${this.baseUrl}/squash/api/rest/latest/test-cases?projectId=${projectId}`,
-      {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }
-    );
-    return response.data;
-  }
-
-  async addTestCaseToIteration(iterationId, testCaseId) {
-    const response = await axios.post(
-      `${this.baseUrl}/squash/api/rest/latest/iterations/${iterationId}/test-plan`,
-      {
-        _type: 'campaign-test-plan-item',
-        test_case: {
-          _type: 'test-case',
-          id: testCaseId
-        }
-      },
-      {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }
-    );
-
-    return { id: response.data.id };
-  }
-
-  async getIterationTestPlan(iterationId) {
-    const response = await axios.get(
-      `${this.baseUrl}/squash/api/rest/latest/iterations/${iterationId}/test-plan`,
-      {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }
-    );
-    return response.data;
-  }
-
-  async createExecution(testPlanItemId) {
-    try {
-      const response = await axios.post(
-        `${this.baseUrl}/squash/api/rest/latest/test-plan-items/${testPlanItemId}/executions`,
-        {
-          _type: 'execution',
-          execution_mode: 'AUTOMATED'
-        },
-        {
-          headers: this.getAuthHeaders(),
-          withCredentials: true
-        }
-      );
-
-      return {
-        id: response.data.id
-      };
-    } catch (error) {
-      if (error.response?.data?.message === 'Execution has no steps') {
-        console.log('⚠️ Test case has no steps in SquashTM');
-        return null;
-      }
-      throw error;
-    }
-  }
-
-  async updateExecutionStatus(executionId, status) {
-    const validStatuses = ['SUCCESS', 'FAILURE', 'BLOCKED'];
-    if (!validStatuses.includes(status)) {
-      throw new Error(`Invalid status: ${status}`);
-    }
-
-    const response = await axios.patch(
-      `${this.baseUrl}/squash/api/rest/latest/executions/${executionId}`,
-      {
-        _type: 'execution',
-        execution_status: status
-      },
-      {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }
-    );
-
-    return { id: response.data.id, status };
-  }
-
-  async finishIteration(iterationId) {
-    const response = await axios.patch(
-      `${this.baseUrl}/squash/api/rest/latest/iterations/${iterationId}`,
-      { status: 'FINISHED' },
-      {
-        headers: this.getAuthHeaders(),
-        withCredentials: true
-      }
-    );
-    return response.data;
-  }
-}
-
-module.exports = { SquashAPI };
-```
-
----
-
-## Step 6: Test Script
-
-File: `scripts/test-squash-api.js`
-
-```javascript
-const { SquashAPI } = require('../cypress/support/squash-api');
-const fs = require('fs');
-
-async function test() {
-  const apiToken = fs.readFileSync('./apitoken.txt', 'utf8').trim();
-
-  const api = new SquashAPI({
-    baseUrl: 'http://localhost:8080',
-    apiToken: apiToken
+    cy.task("squash:createIteration", {
+      campaignId: Number(CAMPAIGN_ID),
+      name: `Run ${Date.now()}`,
+    }).then((iteration: any) => {
+      iterationId = iteration.id;
+    });
   });
+});
 
-  // 1. Login
-  console.log('1. Logging in...');
-  await api.login();
+// After each: Report result
+afterEach(function () {
+  const testName = this.currentTest?.title || "";
+  const testCaseId = getTestCaseId(testName);
+  if (!testCaseId || !iterationId) return;
 
-  // 2. Use existing campaign - UPDATE THIS to your campaign ID
-  const campaignId = 1;  // <-- Change this to your campaign ID
-  console.log(`2. Using campaign ID: ${campaignId}`);
+  const status = this.currentTest?.state === "passed" ? "SUCCESS" : "FAILURE";
+  cy.task("squash:report", { iterationId, testCaseId, status });
+});
 
-  // 3. Create iteration
-  console.log('3. Creating iteration...');
-  const iteration = await api.createIteration(campaignId);
-  console.log('Created:', iteration);
-
-  // 4. Get test cases - UPDATE THIS to your project ID
-  console.log('4. Fetching test cases...');
-  const projectId = 1;  // <-- Change this to your project ID
-  const testCases = await api.getTestCases(projectId);
-
-  if (testCases._embedded?.['test-cases']?.length > 0) {
-    const testCaseId = testCases._embedded['test-cases'][0].id;
-    console.log('Using test case ID:', testCaseId);
-
-    // 5. Add to iteration
-    console.log('5. Adding test case to iteration...');
-    await api.addTestCaseToIteration(iteration.id, testCaseId);
-
-    // 6. Get test plan item
-    console.log('6. Getting test plan...');
-    const testPlan = await api.getIterationTestPlan(iteration.id);
-    const tpItem = testPlan._embedded['test-plan'][0];
-
-    // 7. Create execution
-    console.log('7. Creating execution...');
-    const execution = await api.createExecution(tpItem.id);
-
-    if (execution) {
-      // 8. Update status
-      console.log('8. Updating status to SUCCESS...');
-      await api.updateExecutionStatus(execution.id, 'SUCCESS');
-    }
-
-    // 9. Finish iteration
-    console.log('9. Finishing iteration...');
-    await api.finishIteration(iteration.id);
-  }
-
-  console.log('\n✅ Done!');
-}
-
-test().catch(err => {
-  console.error('❌ Failed:', err.message);
-  process.exit(1);
+// After all: Finish iteration
+after(() => {
+  if (iterationId) cy.task("squash:finish");
 });
 ```
 
 ---
 
-## Step 7: Run Test
+## How to Use
+
+### 1. Create Test Case in SquashTM
+
+- Go to Project → Test Cases → New Test Case
+- Add at least one step (required for execution)
+- Note the test case ID from URL
+
+### 2. Map in `squash-mappings.ts`
+
+```typescript
+"TC-1: gets a list of users": 2,  // 2 is the SquashTM test case ID
+```
+
+### 3. Run Tests
 
 ```bash
-node scripts/test-squash-api.js
+npx cypress run --spec "cypress/tests/api/api-users.spec.ts"
 ```
 
-**Expected output:**
-```
-1. Logging in...
-2. Using campaign ID: 1
-3. Creating iteration...
-Created: { id: 6, name: '[Auto]-2026-02-12T...' }
-4. Fetching test cases...
-5. Adding test case to iteration...
-6. Getting test plan...
-7. Creating execution...
-8. Updating status to SUCCESS...
-9. Finishing iteration...
-✅ Done!
-```
+Results auto-appear in SquashTM under Campaign 11.
 
 ---
 
-## Step 8: Integrate with Cypress
+## Key Debugging Lessons
 
-### Option A: Global Setup (cypress/support/e2e.ts)
+| Problem | Why It Happens | Fix |
+|---------|---------------|-----|
+| `fs is not defined` | Browser can't use Node.js `fs` | Use `cy.readFile()` or `cy.task()` |
+| `Network Error` | CORS blocks browser API calls | Move calls to `cy.task()` (Node.js) |
+| `Invalid type for argument` | API expects number, got string | Use `Number(campaignId)` |
+| `Execution has no steps` | Test case in SquashTM has no steps | Add steps in SquashTM UI |
 
-```typescript
-import { SquashAPI } from './squash-api';
-import * as fs from 'fs';
-
-const CAMPAIGN_ID = 1;  // Update to your campaign ID
-const PROJECT_ID = 1;   // Update to your project ID
-
-let squashApi: SquashAPI | null = null;
-let iterationId: number | null = null;
-let testCaseMap: Map<string, number> = new Map();  // Map test names to test case IDs
-
-before(async () => {
-  // Initialize API client
-  const apiToken = fs.readFileSync('./apitoken.txt', 'utf8').trim();
-  squashApi = new SquashAPI({
-    baseUrl: 'http://localhost:8080',
-    apiToken: apiToken
-  });
-
-  // Login to SquashTM
-  await squashApi.login();
-
-  // Create iteration for this test run
-  const iteration = await squashApi.createIteration(CAMPAIGN_ID, `Cypress Run - ${new Date().toISOString()}`);
-  iterationId = iteration.id;
-
-  // Load test case mappings (you can also load from a JSON file)
-  const testCases = await squashApi.getTestCases(PROJECT_ID);
-  if (testCases._embedded?.['test-cases']) {
-    for (const tc of testCases._embedded['test-cases']) {
-      testCaseMap.set(tc.name, tc.id);
-    }
-  }
-});
-
-afterEach(async function() {
-  if (!squashApi || !iterationId) return;
-
-  const testName = this.currentTest?.title;
-  const testCaseId = testCaseMap.get(testName);
-
-  if (testCaseId) {
-    // Add test case to iteration
-    await squashApi.addTestCaseToIteration(iterationId, testCaseId);
-
-    // Get test plan item
-    const testPlan = await squashApi.getIterationTestPlan(iterationId);
-    const tpItem = testPlan._embedded?.['test-plan']?.find(
-      (item: any) => item.test_case.id === testCaseId
-    );
-
-    if (tpItem) {
-      // Create execution
-      const execution = await squashApi.createExecution(tpItem.id);
-      if (execution) {
-        // Update status based on test result
-        const status = this.currentTest?.state === 'passed' ? 'SUCCESS' : 'FAILURE';
-        await squashApi.updateExecutionStatus(execution.id, status);
-      }
-    }
-  }
-});
-
-after(async () => {
-  if (squashApi && iterationId) {
-    await squashApi.finishIteration(iterationId);
-  }
-});
-```
-
-### Option B: Using Test Annotations (Recommended)
-
-Create a custom command to map tests:
-
-**cypress/support/commands.ts:**
-```typescript
-Cypress.Commands.add('squashTest', (testCaseId: number) => {
-  cy.wrap(testCaseId).as('currentSquashTestCaseId');
-});
-```
-
-**In your test:**
-```typescript
-it('should login successfully', () => {
-  cy.squashTest(123);  // Your SquashTM test case ID
-  // ... test code
-});
-```
+**Remember**: Browser context ≠ Node.js context. Use `cy.task()` to bridge.
 
 ---
 
-## Step 9: Test with Postman (Optional)
+## Files You Need
 
-If you want to test APIs manually in Postman, you need all three authentication components:
-
-### Headers Required
-
-```
-Authorization: Bearer YOUR_API_TOKEN
-Cookie: JSESSIONID=YOUR_SESSION; XSRF-TOKEN=YOUR_XSRF_TOKEN
-X-XSRF-TOKEN: YOUR_XSRF_TOKEN
-```
-
-### Getting Session Tokens
-
-1. **Get XSRF Token:**
-   ```bash
-   curl -i http://localhost:8080/squash/login
-   # Look for Set-Cookie: XSRF-TOKEN=...
-   ```
-
-2. **Login to get JSESSIONID:**
-   ```bash
-   curl -i -X POST http://localhost:8080/squash/backend/login \
-     -H "Content-Type: application/x-www-form-urlencoded" \
-     -H "X-XSRF-TOKEN: YOUR_XSRF_TOKEN" \
-     -H "Cookie: XSRF-TOKEN=YOUR_XSRF_TOKEN" \
-     -d "username=admin&password=admin"
-   # Look for Set-Cookie: JSESSIONID=...
-   ```
-
-3. **Use in Postman:**
-   - Add `Authorization: Bearer YOUR_API_TOKEN`
-   - Add `Cookie: JSESSIONID=xxx; XSRF-TOKEN=yyy`
-   - Add `X-XSRF-TOKEN: yyy`
+| File | Purpose |
+|------|---------|
+| `cypress/support/squash-api.js` | API client (see working code in repo) |
+| `cypress/support/squash-tasks.js` | Task handlers (see working code in repo) |
+| `cypress/support/squash-mappings.ts` | **You edit this** - map tests to IDs |
+| `cypress/support/e2e.ts` | **You edit this** - add hooks |
+| `cypress.config.ts` | **You edit this** - register tasks |
+| `apitoken.txt` | **You create this** - API token |
 
 ---
 
-## Using in Other Repos
+## Quick Checklist
 
-To use this integration in another project:
-
-### 1. Copy Required Files
-
-```
-cypress/support/squash-api.js       # API client
-scripts/test-squash-api.js          # Test script (optional)
-apitoken.txt                        # Your API token (add to .gitignore!)
-```
-
-### 2. Install Dependency
-
-```bash
-npm install axios
-```
-
-### 3. Update IDs
-
-Edit the script to use your campaign and project IDs.
-
-### 4. Environment Variables (Recommended for CI)
-
-Instead of `apitoken.txt`, use environment variables:
-
-```javascript
-const apiToken = process.env.SQUASH_API_TOKEN;
-const baseUrl = process.env.SQUASH_URL || 'http://localhost:8080';
-```
-
----
-
-## API Reference
-
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| POST | `/backend/login` | Authenticate |
-| POST | `/campaigns/{id}/iterations` | Create iteration |
-| GET | `/test-cases?projectId={id}` | List test cases |
-| POST | `/iterations/{id}/test-plan` | Add test case |
-| POST | `/test-plan-items/{id}/executions` | Create execution |
-| PATCH | `/executions/{id}` | Update status |
-| PATCH | `/iterations/{id}` | Finish iteration |
-
----
-
-## Troubleshooting
-
-| Error | Fix |
-|-------|-----|
-| "Execution has no steps" | Add steps to test case in SquashTM UI |
-| "No entity known for type campaign-folder" | Use existing campaign ID (check UI) |
-| "Unauthorized" / 401 | Check API token is valid and not expired |
-| 401 on API calls | Run `api.login()` first to get session |
-| 401 in Postman | Include all headers: Authorization + Cookie + X-XSRF-TOKEN |
-| "Test case not found" | Check project ID and test case exist |
-| Cannot find module 'axios' | Run `npm install axios` |
-
----
-
-## Next Steps
-
-- [ ] Integrate with GitHub Actions
-- [ ] Map multiple test cases by name/ID
-- [ ] Add error screenshots to executions
-- [ ] Auto-create test cases from Cypress specs
-- [ ] Add retry logic for API failures
+- [ ] API token in `apitoken.txt`
+- [ ] Test cases created in SquashTM with steps
+- [ ] Test case IDs mapped in `squash-mappings.ts`
+- [ ] Campaign ID set in `e2e.ts`
+- [ ] Tasks registered in `cypress.config.ts`
+- [ ] Run tests with `npx cypress run`
