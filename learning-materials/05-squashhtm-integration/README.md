@@ -8,6 +8,7 @@ Auto-report Cypress test results to SquashTM.
 
 | Topic | File |
 |-------|------|
+| **Setup Guide** | [00-setup-guide.md](00-setup-guide.md) ← Start here for new projects |
 | Concepts & Hierarchy | [01-concepts.md](01-concepts.md) |
 | Test Execution Flow | [02-flow.md](02-flow.md) |
 | Status Meanings | [03-statuses.md](03-statuses.md) |
