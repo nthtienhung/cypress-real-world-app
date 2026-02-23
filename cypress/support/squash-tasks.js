@@ -61,4 +61,10 @@ module.exports = {
     }
     return { success: false };
   },
+
+  squashCreateCampaign: async ({ folderId, name }) => {
+    console.log("squashCreateCampaign called with:", { folderId, name });
+    const campaign = await squashApi.createCampaign(folderId, name);
+    return campaign;
+  },
 };

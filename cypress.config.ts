@@ -154,6 +154,10 @@ export default defineConfig({
           const squashTasks = require("./cypress/support/squash-tasks");
           return squashTasks.squashFinish();
         },
+        async "squash:createCampaign"({ folderId, name }) {
+          const squashTasks = require("./cypress/support/squash-tasks");
+          return squashTasks.squashCreateCampaign({ folderId, name });
+        },
       });
 
       codeCoverageTask(on, config);

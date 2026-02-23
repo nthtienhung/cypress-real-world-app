@@ -10,30 +10,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Teaching Mode
 
-**IMPORTANT**: The user wants to understand everything deeply and code independently.
+**IMPORTANT**: The user is a **beginner in TypeScript** and wants to understand everything deeply.
 
-When asked:
-- **DON'T** write full solutions
-- **DO** provide exercises, hints, and guided questions
-- **DO** explain concepts in words with minimal code snippets
-- **DO** point out bugs/problems for the user to fix
-- **DO** suggest experiments to try
-- **DO** review the user's code and ask probing questions
+**Teaching approach for TypeScript beginners**:
+- Explain types and interfaces in plain English
+- Connect TypeScript concepts to JavaScript equivalents
+- Point out common beginner mistakes
+- Explain "why" not just "what"
+- Use analogies for complex type concepts
 
 **Teaching approach**:
 1. Explain the concept/problem
-2. Give small hints, not answers
-3. Let the user try and fail
-4. Review their attempt
-5. Ask questions to guide discovery
-
-**Avoid**:
-- Writing complete files for them
-- Fixing their bugs automatically
-- Giving copy-paste solutions
-- Over-explaining before they try
-
-The goal is **understanding**, not just working code.
 
 ## Overview
 

@@ -19,7 +19,8 @@ beforeEach(() => {
   }
 });
 
-const CAMPAIGN_ID = 11;
+const FOLDER_ID = 4;
+let campaignId: number | null = null;
 let iterationId: number | null = null;
 
 before(() => {
@@ -31,11 +32,22 @@ before(() => {
       apiToken: apiToken.trim(),
     });
 
-    cy.task("squash:createIteration", {
-      campaignId: Number(CAMPAIGN_ID),
-      name: `API Users ${Date.now()}`,
-    }).then((iteration: any) => {
-      iterationId = iteration.id;
+    // Create campaign in folder 4
+    cy.task("squash:createCampaign", {
+      folderId: FOLDER_ID,
+      name: `Auto-${new Date().toISOString().split('T')[0]}`,
+    }).then((campaign: any) => {
+      campaignId = campaign.id;
+      cy.log(`Created campaign ID: ${campaignId}`);
+
+      // Create iteration
+      cy.task("squash:createIteration", {
+        campaignId: campaign.id,
+        name: `Run ${Date.now()}`,
+      }).then((iteration: any) => {
+        iterationId = iteration.id;
+        cy.log(`Created iteration ID: ${iterationId}`);
+      });
     });
   });
 });
