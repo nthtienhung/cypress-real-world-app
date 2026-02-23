@@ -35,7 +35,7 @@ before(() => {
     // Create campaign in folder 4
     cy.task("squash:createCampaign", {
       folderId: FOLDER_ID,
-      name: `Auto-${new Date().toISOString().split('T')[0]}`,
+      name: `Auto-${new Date().toISOString().replace(/[:.]/g, '-')}`,
     }).then((campaign: any) => {
       campaignId = campaign.id;
       cy.log(`Created campaign ID: ${campaignId}`);

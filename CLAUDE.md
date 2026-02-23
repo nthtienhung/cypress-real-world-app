@@ -19,8 +19,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Explain "why" not just "what"
 - Use analogies for complex type concepts
 
+**Challenge & Correct**:
+- **Always correct the user** when they say something wrong
+- Correct incorrect terms, phrases, definitions, or concepts
+- Be direct but helpful - "Actually, that's not quite right..." or "The correct term is..."
+- This builds accurate understanding, not misconceptions
+
 **Teaching approach**:
 1. Explain the concept/problem
+2. Correct any misunderstandings immediately
 
 ## Overview
 
@@ -269,3 +276,89 @@ yarn cypress:run --env coverage=true
 # View report
 open coverage/index.html
 ```
+
+---
+
+## SquashTM Integration
+
+### Overview
+Auto-report Cypress test results to SquashTM test management tool.
+
+### Key Files
+| File | Purpose |
+|------|---------|
+| `cypress/support/squash-api.js` | SquashTM REST API client |
+| `cypress/support/squash-tasks.js` | Node.js functions called by `cy.task()` |
+| `cypress/support/squash-mappings.ts` | Map test names → SquashTM test case IDs |
+| `cypress/support/e2e.ts` | Cypress hooks (before/afterEach/after) |
+
+### Current Configuration
+- **Folder ID**: `4` (campaigns auto-created here)
+- **Base URL**: `https://squash-tm-dev-01.l0tt0.online`
+- **Username**: `hung.nguyen`
+
+### Key REST API Endpoints
+| Action | Method | Endpoint |
+|--------|--------|----------|
+| Create Campaign | POST | `/squash/api/rest/latest/campaigns` |
+| Create Iteration | POST | `/squash/api/rest/latest/campaigns/{id}/iterations` |
+| Add Test to Iteration | POST | `/squash/api/rest/latest/iterations/{id}/test-plan` |
+| Create Execution | POST | `/squash/api/rest/latest/test-plan-items/{id}/executions` |
+| Update Execution | PATCH | `/squash/api/rest/latest/executions/{id}` |
+
+### Documentation
+→ `learning-materials/05-squashhtm-integration/README.md`
+
+### Known Bugs Fixed
+
+**Test Plan Item Matching Bug**:
+- **Problem**: Code always used first test plan item `[0]` when reporting results
+- **Symptom**: Multiple tests reported to the same test case, others showed no execution
+- **Fix**: `squash-tasks.js` line 32 - use `.find()` to match testCaseId
+- **Code**:
+  ```javascript
+  // Before (wrong)
+  const tpItem = testPlan._embedded?.['test-plan']?.[0];
+
+  // After (correct)
+  const tpItem = testPlan._embedded?.['test-plan']?.find(
+    item => item.referenced_test_case?.id === testCaseId
+  );
+  ```
+
+---
+
+## Learning & Documentation Pattern
+
+### When User Asks "How does this work?"
+1. **Explain clearly** - Trace through the code flow
+2. **Show the API call** - Include endpoint, method, request/response
+3. **Update documentation** - Add Q&A to relevant learning-materials/*.md
+4. **Note patterns** - Capture reusable patterns for future reference
+
+### Example Pattern
+When implementing a feature that calls an external API:
+- Show the exact REST endpoint
+- Include request/response examples
+- Point to the code location (file:line numbers)
+- Update the relevant learning material
+
+This ensures important discoveries are documented for future reference.
+
+
+### Auto-Update Memory (MANDATORY)
+
+**Update memory files AS YOU GO, not at the end.** When you learn something new, update immediately.
+
+| Trigger | Action |
+|---------|--------|
+| User shares a fact about themselves | → Update `memory-profile.md` |
+| User states a preference | → Update `memory-preferences.md` |
+| A decision is made | → Update `memory-decisions.md` with date |
+| Completing substantive work | → Add to `memory-sessions.md` |
+
+**Skip:** Quick factual questions, trivial tasks with no new info.
+
+**DO NOT ASK. Just update the files when you learn something.**
+
+Memory layer: Instead of one big CLAUDE.md, I split into .claude/rules/memory-*.md files — profile (facts about me), preferences (how I like things done), decisions (past choices for consistency), and sessions (rolling summary of recent work). Claude Code auto-loads everything in .claude/rules/ so it's always in context without bloating the main CLAUDE.md.

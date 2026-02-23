@@ -29,8 +29,12 @@ module.exports = {
       console.log('[SquashTask] Test plan items:', testPlan._embedded?.['test-plan']?.length);
 
       console.log('[SquashTask] Full test plan:', JSON.stringify(testPlan, null, 2));
-      const tpItem = testPlan._embedded?.['test-plan']?.[0];
-      console.log('[SquashTask] Using first test plan item:', tpItem?.id);
+
+      // Find the test plan item that matches our testCaseId
+      const tpItem = testPlan._embedded?.['test-plan']?.find(
+        item => item.referenced_test_case?.id === testCaseId
+      );
+      console.log('[SquashTask] Using test plan item:', tpItem?.id, 'for test case:', testCaseId);
 
       if (tpItem) {
         console.log('[SquashTask] Creating execution...');

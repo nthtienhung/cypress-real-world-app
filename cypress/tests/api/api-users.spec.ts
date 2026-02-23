@@ -36,25 +36,25 @@ describe("Users API", function () {
     });
   });
 
-  // context("GET /users/:userId", function () {
-  //   it("gets a user", function () {
-  //     cy.request("GET", `${apiUsers}/${ctx.authenticatedUser!.id}`).then((response) => {
-  //       expect(response.status).to.eq(200);
-  //       expect(response.body.user).to.have.property("firstName");
-  //     });
-  //   });
+  context("GET /users/:userId", function () {
+    it("TC-2: gets a single user", function () {
+      cy.request("GET", `${apiUsers}/${ctx.authenticatedUser!.id}`).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body.user).to.have.property("firstName");
+      });
+    });
 
-  //   it("errors when invalid userId", function () {
-  //     cy.request({
-  //       method: "GET",
-  //       url: `${apiUsers}/1234`,
-  //       failOnStatusCode: false,
-  //     }).then((response) => {
-  //       expect(response.status).to.eq(422);
-  //       expect(response.body.errors.length).to.eq(1);
-  //     });
-  //   });
-  // });
+    // it("errors when invalid userId", function () {
+    //   cy.request({
+    //     method: "GET",
+    //     url: `${apiUsers}/1234`,
+    //     failOnStatusCode: false,
+    //   }).then((response) => {
+    //     expect(response.status).to.eq(422);
+    //     expect(response.body.errors.length).to.eq(1);
+    //   });
+    // });
+  });
 
   // context("GET /users/profile/:username", function () {
   //   it("gets a user profile by username", function () {
